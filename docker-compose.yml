@@ -1,0 +1,53 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: shop
+      MARIADB_USER: shop
+      MARIADB_PASSWORD: shop_local_pw
+      MARIADB_ROOT_PASSWORD: root_local_pw
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    build: ./docker/wordpress
+    restart: unless-stopped
+    depends_on: [db]
+    ports:
+      - "${SITE_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: shop
+      WORDPRESS_DB_USER: shop
+      WORDPRESS_DB_PASSWORD: shop_local_pw
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_MEMORY_LIMIT', '256M');
+        define('DISALLOW_FILE_EDIT', true);
+    volumes:
+      - wp_data:/var/www/html
+      - ./theme/blocksy-child:/var/www/html/wp-content/themes/blocksy-child
+      - ./plugins/boutique-admin:/var/www/html/wp-content/plugins/boutique-admin
+      - ./config:/var/www/html/wp-content/shop-config:ro
+
+  wpcli:
+    build: ./docker/wpcli
+    depends_on: [db, wordpress]
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: shop
+      WORDPRESS_DB_USER: shop
+      WORDPRESS_DB_PASSWORD: shop_local_pw
+    volumes:
+      - wp_data:/var/www/html
+      - ./theme/blocksy-child:/var/www/html/wp-content/themes/blocksy-child
+      - ./plugins/boutique-admin:/var/www/html/wp-content/plugins/boutique-admin
+      - ./config:/var/www/html/wp-content/shop-config:ro
+      - ./scripts:/scripts
+    entrypoint: ["wp"]
+    profiles: ["cli"]
+
+volumes:
+  db_data:
+  wp_data:

@@ -1,0 +1,11 @@
+{
+  "name": "persian-boutique-shop",
+  "private": true,
+  "scripts": {
+    "test": "playwright test -c tests/playwright.config.js",
+    "test:ui": "playwright test -c tests/playwright.config.js --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  }
+}
