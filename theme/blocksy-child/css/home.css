@@ -1,0 +1,260 @@
+/*
+ * Home page (front page only).
+ * One curve: the arch. Everything else is square-cornered and flat: no gradients, no glass,
+ * no drop shadows, no marquee. Color is used as whole fields (rose sale band, ink closing band).
+ * Motion: one entrance on the hero; presses scale .97; hovers only on real pointers.
+ * Persian script is connected: never letter-space it.
+ */
+html, body { overflow-x: clip; }
+.home #main > [class*="ct-container"] { padding-block: 0 !important; }
+.home .entry-content > * { margin-block: 0; }
+.home .entry-content > * + * { margin-top: clamp(72px, 9vw, 128px); }
+
+/* ---------- Buttons (home) ---------- */
+.b-btn {
+	display: inline-flex; align-items: center; gap: .55em; min-height: 52px; padding: 0 1.6em;
+	border-radius: var(--b-radius-btn); border: 1.5px solid transparent;
+	font-weight: 700; font-size: 1rem; text-decoration: none;
+	transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .16s var(--ease-out);
+}
+.b-btn:active { transform: scale(.97); }
+.b-btn--solid { background: var(--b-btn); color: var(--b-on-btn); }
+.b-btn--ghost { border-color: var(--b-ink); color: var(--b-ink); }
+.b-btn--light { background: var(--b-cream); color: var(--b-ink); }
+.b-arrow { flex: none; transition: transform .2s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+	.b-btn--solid:hover { background: var(--b-btn-hover); color: var(--b-on-btn); }
+	.b-btn--ghost:hover { background: var(--b-ink); color: var(--b-cream); }
+	.b-btn--light:hover { background: #fff; color: var(--b-rose-deep); }
+	a:hover > .b-arrow, a:hover .b-arrow { transform: translateX(-4px); }
+}
+
+.b-sale, .b-visit { width: 100vw; max-width: none !important; margin-inline: calc(50% - 50vw) !important; }
+
+/* ================================================================ Hero */
+/* Text beside an arch-shaped window full of her clothes: three columns of photos drifting
+   slowly (the middle one the other way). Linear motion, transform only; pauses on hover (to
+   click a photo), off-screen and for reduced-motion. */
+.b-hero2 {
+	display: grid; grid-template-columns: 1fr 1.05fr; align-items: center;
+	gap: clamp(24px, 5vw, 80px);
+	padding-block: clamp(32px, 5vw, 64px) 0;
+}
+.b-hero2__text { padding-block: clamp(8px, 3vw, 48px); }
+.b-hero2__title {
+	margin: 0 0 .5em; font-size: clamp(2.2rem, 1.2rem + 3.2vw, 4rem); font-weight: 800;
+	line-height: 1.25; color: var(--b-ink); text-wrap: balance;
+}
+.b-hero2__title em { font-style: normal; color: var(--b-rose-deep); }
+.b-hero2__lede { max-width: 42ch; margin: 0 0 2em; font-size: clamp(1.05rem, 1rem + .3vw, 1.2rem); line-height: 1.9; color: var(--b-text); }
+.b-hero2__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.b-wall {
+	position: relative; height: clamp(440px, 46vw, 640px); overflow: hidden;
+	border-radius: 999px 999px var(--b-radius) var(--b-radius);
+	background: var(--b-blush);
+	display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-inline: 10px;
+	-webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
+	        mask-image: linear-gradient(to bottom, #000 82%, transparent);
+}
+.b-wall__col { display: flex; flex-direction: column; gap: 10px; will-change: transform; }
+.b-wall__col:nth-child(2) { margin-top: -18%; }
+.b-wall a { display: block; flex: none; aspect-ratio: 3 / 4; overflow: hidden; border-radius: var(--b-radius); background: #f0c9ce; }
+.b-wall img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .b-wall a:hover img { transform: scale(1.04); } }
+/* Thin second arch drawn around the window: the brand mark, echoed. */
+.b-hero2__stage { position: relative; }
+.b-hero2__stage::after {
+	content: ""; position: absolute; inset: -14px -14px auto; height: 60%; pointer-events: none;
+	border: 1px solid var(--b-line); border-bottom: 0; border-radius: 999px 999px 0 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.b-wall__col { animation: b-drift var(--d, 60s) linear infinite; }
+	.b-wall__col:nth-child(2) { animation-direction: reverse; --d: 72s; }
+	.b-wall__col:nth-child(3) { --d: 66s; }
+	.b-wall:hover .b-wall__col, .b-wall.is-off .b-wall__col { animation-play-state: paused; }
+	.b-wall { animation: b-open .9s var(--ease-out) both; }
+}
+/* Each column holds its photos twice; moving up by half loops seamlessly. */
+@keyframes b-drift { from { transform: translateY(0); } to { transform: translateY(calc(-50% - 5px)); } }
+@keyframes b-open { from { clip-path: inset(100% 0 0 0 round 999px 999px 0 0); } to { clip-path: inset(0 0 0 0 round 999px 999px 0 0); } }
+
+/* ============================================================ Promises */
+.b-promises {
+	list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr);
+	border-block: 1px solid var(--b-line);
+}
+.home .entry-content > .b-promises { margin-top: 0; }
+.b-promises li { padding: 18px 12px; text-align: center; font-weight: 600; font-size: .95rem; color: var(--b-ink); }
+.b-promises li + li { border-inline-start: 1px solid var(--b-line); }
+
+/* ================================================================ Sale */
+.b-sale { background: var(--b-btn); color: #fffaf7; padding-block: clamp(64px, 8vw, 104px); }
+.b-sale__inner {
+	max-width: var(--theme-normal-container-max-width, 1290px); margin-inline: auto; padding-inline: 16px;
+	display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: clamp(32px, 5vw, 72px); align-items: center;
+}
+.b-sale__title { margin: 0; color: #fff; font-size: clamp(3.4rem, 2rem + 6vw, 5.8rem); font-weight: 800; line-height: 1.1; }
+.b-sale__big { margin: .35em 0 .6em; font-size: 1.3rem; font-weight: 600; color: #fbe6e9; }
+.b-sale__big span { font-size: 2.4em; font-weight: 800; color: #fff; line-height: 1; vertical-align: -0.12em; }
+.b-sale__note { margin: 0 0 1.8em; font-size: .95rem; line-height: 1.8; color: #f6dfe2; max-width: 30ch; }
+.b-sale__rail {
+	list-style: none; margin: 0; padding: 0 0 12px;
+	/* Fixed card width: one or two sale items stay card-sized instead of stretching across the band. */
+	display: grid; grid-auto-flow: column; grid-auto-columns: clamp(200px, 19vw, 250px); justify-content: start; gap: clamp(14px, 2vw, 24px);
+	overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+	scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .45) transparent;
+}
+.b-sale__item { scroll-snap-align: start; }
+.b-sale__card { display: block; color: inherit; text-decoration: none; }
+.b-sale__media { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 999px 999px 0 0; background: #f0c9ce; }
+.b-sale__media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .b-sale__card:hover img { transform: scale(1.03); } }
+.b-sale__off { position: absolute; bottom: 0; inset-inline-start: 0; padding: 6px 12px; background: var(--b-badge); color: var(--b-on-badge); font-size: .8rem; font-weight: 700; }
+.b-sale__name { display: block; margin-top: 14px; font-weight: 700; font-size: 1rem; color: #fff; }
+.b-sale__price { display: block; margin-top: 4px; font-size: .95rem; color: #fff; }
+.b-sale__price del { color: #fbe3e6; opacity: 1; font-weight: 400; font-size: .88em; margin-inline-end: 6px; }
+.b-sale__price ins { text-decoration: none; font-weight: 800; }
+
+/* ============================================================ Row heads */
+.b-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: clamp(20px, 2.5vw, 32px); padding-bottom: 14px; border-bottom: 1px solid var(--b-line); }
+.b-row-head h2 { margin: 0; font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.4rem); font-weight: 800; color: var(--b-ink); }
+.b-row-head a { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--b-rose-deep); text-decoration: none; }
+
+/* ========================================================== Categories */
+/* An index, not a card grid: the six names set large, and one arch window (the hero's shape,
+   the only curve) showing whichever name is hovered or focused. Phones: each row carries its
+   own small arch. */
+.b-idx { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: clamp(32px, 6vw, 104px); align-items: center; }
+.b-idx__list { list-style: none; margin: 0; padding: 0; }
+.b-idx__list li:last-child .b-idx__row { border-bottom: 0; }
+.b-idx__row {
+	display: flex; align-items: center; gap: clamp(12px, 1.4vw, 20px);
+	padding: clamp(14px, 1.5vw, 20px) 2px; border-bottom: 1px solid var(--b-line);
+	color: var(--b-muted); text-decoration: none;
+}
+.b-idx__row strong {
+	font-size: clamp(1.45rem, .9rem + 1.9vw, 2.6rem); font-weight: 800; line-height: 1.25; color: inherit;
+	transition: color .25s ease, transform .45s var(--ease-out);
+}
+.b-idx__count { margin-inline-start: auto; font-size: .9rem; color: var(--b-text); white-space: nowrap; }
+.b-idx__row .b-arrow { opacity: 0; transform: translateX(10px); transition: opacity .25s ease, transform .35s var(--ease-out); color: var(--b-rose-deep); }
+.b-idx__row.is-on, .b-idx__row:focus-visible { color: var(--b-ink); }
+.b-idx__row.is-on strong { transform: translateX(-8px); }
+.b-idx__row.is-on .b-arrow { opacity: 1; transform: none; }
+.b-idx__row:active strong { transform: translateX(-8px) scale(.98); }
+.b-idx__thumb { display: none; }
+
+.b-idx__window {
+	position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+	border-radius: 999px 999px var(--b-radius) var(--b-radius); background: var(--b-blush);
+}
+.b-idx__window::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(59, 42, 45, .12); pointer-events: none; }
+.b-idx__img { position: absolute; inset: 0; opacity: 0; transform: scale(1.06); transition: opacity .45s ease, transform .9s var(--ease-out); }
+.b-idx__img.is-on { opacity: 1; transform: none; }
+.b-idx__img img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; display: block; }
+@media (prefers-reduced-motion: reduce) {
+	.b-idx__img, .b-idx__row strong, .b-idx__row .b-arrow { transition: opacity .2s ease; transform: none !important; }
+}
+
+/* ---- The arcade (default): every category with stock as a row of arches, drifting slowly
+   sideways (JS scrolls it; it loops onto a second copy). Hovering stops the drift and widens
+   that arch; leaving lets it shrink back and the drift continue. Touch: swipe freely. */
+.b-arcade {
+	overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+	margin-inline: calc(50% - 50vw); padding-inline: max(16px, calc(50vw - 50%));
+	-webkit-mask-image: linear-gradient(to left, transparent, #000 6%, #000 94%, transparent);
+	        mask-image: linear-gradient(to left, transparent, #000 6%, #000 94%, transparent);
+}
+.b-arcade::-webkit-scrollbar { display: none; }
+.b-arcade__track { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(10px, 1.1vw, 16px); width: max-content; }
+.b-arcade__item { flex: none; width: clamp(150px, 15vw, 210px); transition: width .7s var(--ease-out); }
+.b-arcade .b-idx__row { display: block; padding: 0; border: 0; color: var(--b-ink); text-decoration: none; }
+.b-arcade__media {
+	position: relative; display: block; height: clamp(280px, 28vw, 400px); overflow: hidden;
+	border-radius: 999px 999px var(--b-radius) var(--b-radius); background: var(--b-blush);
+	outline: 1px solid rgba(59, 42, 45, .12); outline-offset: -1px;
+}
+.b-arcade__media img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; display: block; transition: transform .9s var(--ease-out), filter .4s ease; }
+.b-arcade__label { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; }
+.b-arcade__label strong { font-size: clamp(1rem, .8rem + .5vw, 1.25rem); font-weight: 800; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .25s ease; }
+.b-arcade__label span { font-size: .85rem; color: var(--b-text); white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) {
+	/* Like the first demo: the hovered arch opens and its neighbours give way (they narrow), so the
+	   row keeps its length instead of shoving everything sideways. */
+	.b-arcade__track:hover .b-arcade__item { width: clamp(128px, 12.4vw, 172px); }
+	.b-arcade__track .b-arcade__item:hover, .b-arcade__item:focus-within { width: clamp(300px, 30vw, 420px); }
+	.b-arcade__item:hover .b-arcade__media img { transform: scale(1.03); }
+	.b-arcade:hover .b-arcade__item:not(:hover) .b-arcade__media img { filter: saturate(.7); }
+	.b-arcade:hover .b-arcade__item:not(:hover) .b-arcade__label strong { color: var(--b-muted); }
+}
+.b-arcade.is-static { mask-image: none; -webkit-mask-image: none; }
+.b-arcade.is-static .b-arcade__track { margin-inline: auto; }
+.b-arcade.is-static [data-clone] { display: none; }
+@media (prefers-reduced-motion: reduce) { .b-arcade__item, .b-arcade__media img { transition: none; } }
+@media (max-width: 860px) {
+	.b-arcade__item { width: 42vw; }
+	.b-arcade__media { height: auto; aspect-ratio: 3 / 4.4; }
+}
+
+/* Phones and tablets: no hover, so no shared window; every row shows its own small arch. */
+@media (max-width: 860px) {
+	.b-idx { grid-template-columns: 1fr; }
+	.b-idx__window { display: none; }
+	.b-idx__row { color: var(--b-ink); padding-block: 12px; }
+	.b-idx__row strong { font-size: 1.3rem; transform: none !important; }
+	.b-idx__row .b-arrow { opacity: 1; transform: none; }
+	.b-idx__thumb {
+		display: block; flex: none; width: 52px; aspect-ratio: 3 / 4; overflow: hidden;
+		border-radius: 999px 999px 3px 3px; background: var(--b-blush);
+		outline: 1px solid rgba(59, 42, 45, .14); outline-offset: -1px;
+	}
+	.b-idx__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+.b-new .woocommerce { margin: 0; }
+
+/* =============================================================== Visit */
+.b-visit { position: relative; overflow: hidden; background: var(--b-band); color: #fffaf7; padding-block: clamp(72px, 9vw, 120px); }
+.b-visit::before, .b-visit::after { content: ""; position: absolute; bottom: 0; border: 1px solid rgba(246, 223, 226, .3); border-bottom: 0; border-radius: 999px 999px 0 0; }
+.b-visit::before { inset-inline-end: 6%; width: 260px; height: 78%; }
+.b-visit::after  { inset-inline-end: calc(6% + 290px); width: 200px; height: 60%; }
+.b-visit__inner { position: relative; z-index: 1; max-width: var(--theme-normal-container-max-width, 1290px); margin-inline: auto; padding-inline: 16px; }
+.b-visit h2 { margin: 0 0 .8em; color: #fff; font-size: clamp(1.9rem, 1.3rem + 2.8vw, 3.2rem); font-weight: 800; line-height: 1.4; }
+.b-visit__facts { display: flex; flex-wrap: wrap; gap: 16px 56px; margin: 0 0 2.2em; }
+.b-visit__facts dt { font-size: .85rem; color: #e9c3c9; margin-bottom: 4px; }
+.b-visit__facts dd { margin: 0; font-size: 1.1rem; font-weight: 600; color: #fffaf7; }
+/* Light buttons sit on the colored bands, which stay the same in dark mode. */
+.b-sale .b-btn--light, .b-visit .b-btn--light { background: #fffaf7; color: #3b2a2d; }
+/* Directions button and the two social buttons: one row, one height. */
+.b-visit__actions .b-social { margin: 0; }
+.b-visit__actions .b-btn, .b-visit__actions .b-social a { height: 56px; min-height: 0; box-sizing: border-box; }
+.b-visit__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.home .site-footer, .home footer.ct-footer { margin-top: 0; }
+
+/* ============================================================ Responsive */
+@media (max-width: 1000px) {
+	.b-hero2 { grid-template-columns: 1fr; }
+	.b-hero2__text { padding-bottom: 0; }
+	.b-hero2__stage { max-width: 560px; width: 100%; margin-inline: auto; }
+	.b-sale__inner { grid-template-columns: 1fr; }
+	.b-visit::after { display: none; }
+}
+@media (max-width: 689px) {
+	.b-hero2__actions .b-btn { flex: 1 1 auto; justify-content: center; }
+	.b-wall { height: min(118vw, 540px); gap: 8px; padding-inline: 8px; }
+	.b-wall__col { gap: 8px; }
+	.b-hero2__stage::after { inset: -8px -8px auto; }
+	.b-promises { grid-template-columns: 1fr 1fr; }
+	.b-promises li { font-size: .85rem; padding: 14px 8px; }
+	.b-promises li:nth-child(3) { border-inline-start: 0; }
+	.b-promises li:nth-child(n+3) { border-top: 1px solid var(--b-line); }
+	.b-sale__rail { grid-auto-columns: 62%; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+	.b-visit::before { width: 180px; height: 55%; inset-inline-end: -40px; }
+	/* Two directions buttons side by side, then the two social buttons, all equal width. */
+	.b-visit__actions .b-btn { flex: 1 1 calc(50% - 6px); justify-content: center; padding-inline: .6em; font-size: .9rem; }
+	.b-visit__actions .b-social { flex: 1 1 100%; }
+	.b-visit__actions .b-social li { flex: 1 1 calc(50% - 5px); }
+	.b-visit__actions .b-social a { width: 100%; }
+}
