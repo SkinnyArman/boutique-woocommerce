@@ -6,8 +6,32 @@
  */
 defined( 'ABSPATH' ) || exit;
 
+// «دسته‌بندی‌ها» sits next to «لباس‌ها».
+require_once __DIR__ . '/categories.php';
+
 function boutique_orders_page_url( $args = [] ) { return add_query_arg( array_merge( [ 'page' => 'boutique-orders' ], $args ), admin_url( 'admin.php' ) ); }
 function boutique_products_page_url( $args = [] ) { return add_query_arg( array_merge( [ 'page' => 'boutique-products' ], $args ), admin_url( 'admin.php' ) ); }
+
+/**
+ * Where in «لباس‌ها» the manager was (tab, category, search, page number), cleaned. Carried as
+ * back[…] through the edit form and the delete button, so saving or deleting returns to that page
+ * instead of page 1 (going through hundreds of drafts one by one).
+ */
+function boutique_products_back( $raw ) {
+	$raw   = is_array( $raw ) ? wp_unslash( $raw ) : [];
+	$paged = (int) ( $raw['paged'] ?? 0 );
+	return array_filter( [
+		'tab'   => sanitize_key( $raw['tab'] ?? '' ),
+		'cat'   => sanitize_title( $raw['cat'] ?? '' ),
+		'q'     => trim( sanitize_text_field( $raw['q'] ?? '' ) ),
+		'paged' => $paged > 1 ? $paged : 0,
+	] );
+}
+function boutique_products_back_fields( array $back ) {
+	foreach ( $back as $k => $v ) {
+		echo '<input type="hidden" name="back[' . esc_attr( $k ) . ']" value="' . esc_attr( $v ) . '">';
+	}
+}
 
 add_action( 'admin_menu', function () {
 	$waiting = count( wc_get_orders( [ 'status' => [ 'on-hold', 'processing' ], 'limit' => 50, 'return' => 'ids' ] ) );
@@ -122,13 +146,31 @@ function boutique_orders_page() {
 	<?php
 }
 
-function boutique_pager( $total, $per, $paged, callable $url ) {
+/**
+ * Page links, short enough for one row on a phone (shown above and below a long list):
+ * «قبلی» · 1 … (current−1, current, current+1) … last · «بعدی». Big tap targets.
+ */
+function boutique_pager( $total, $per, $paged, callable $url, $where = 'bottom' ) {
 	$pages = (int) ceil( $total / $per );
 	if ( $pages < 2 ) { return; }
-	echo '<nav class="b-pager" aria-label="صفحه‌ها">';
-	for ( $p = 1; $p <= $pages; $p++ ) {
-		echo $p === $paged ? '<span aria-current="page">' . esc_html( boutique_fa_digits( $p ) ) . '</span>' : '<a href="' . esc_url( $url( $p ) ) . '">' . esc_html( boutique_fa_digits( $p ) ) . '</a>';
+	$show = array_unique( array_filter( [ 1, $paged - 1, $paged, $paged + 1, $pages ], fn( $p ) => $p >= 1 && $p <= $pages ) );
+	sort( $show );
+	$fa = fn( $n ) => esc_html( boutique_fa_digits( $n ) );
+	echo '<nav class="b-pager b-pager--' . esc_attr( $where ) . '" aria-label="صفحه‌ها">';
+	echo $paged > 1
+		? '<a class="b-pager__step" href="' . esc_url( $url( $paged - 1 ) ) . '" rel="prev">قبلی</a>'
+		: '<span class="b-pager__step is-off" aria-hidden="true">قبلی</span>';
+	$prev = 0;
+	foreach ( $show as $p ) {
+		if ( $prev && $p > $prev + 1 ) { echo '<span class="b-pager__gap" aria-hidden="true">…</span>'; }
+		echo $p === $paged
+			? '<span class="b-pager__num" aria-current="page">' . $fa( $p ) . '</span>'
+			: '<a class="b-pager__num" href="' . esc_url( $url( $p ) ) . '" aria-label="صفحه ' . $fa( $p ) . '">' . $fa( $p ) . '</a>';
+		$prev = $p;
 	}
+	echo $paged < $pages
+		? '<a class="b-pager__step" href="' . esc_url( $url( $paged + 1 ) ) . '" rel="next">بعدی</a>'
+		: '<span class="b-pager__step is-off" aria-hidden="true">بعدی</span>';
 	echo '</nav>';
 }
 
@@ -146,12 +188,12 @@ function boutique_product_stock_summary( WC_Product $p ) {
 
 /* ------------------------------------------------ Delete a draft */
 /** «حذف» button for a draft (published items can't be deleted from here). */
-function boutique_draft_delete_form( WC_Product $p, $from = 'list' ) {
+function boutique_draft_delete_form( WC_Product $p, $from = 'list', array $back = [] ) {
 	if ( 'publish' === $p->get_status() || ! current_user_can( 'delete_post', $p->get_id() ) ) { return; } ?>
 	<form class="b-delform" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( '«' . $p->get_name() . '» حذف شود؟' ); ?>')">
 		<input type="hidden" name="action" value="boutique_product_delete">
 		<input type="hidden" name="product" value="<?php echo (int) $p->get_id(); ?>">
-		<?php wp_nonce_field( 'boutique_product_delete_' . $p->get_id() ); ?>
+		<?php wp_nonce_field( 'boutique_product_delete_' . $p->get_id() ); boutique_products_back_fields( $back ); ?>
 		<button type="submit" class="b-btn <?php echo 'editor' === $from ? 'b-btn--ghost' : 'b-btn--quiet'; ?> b-btn--del">حذف</button>
 	</form>
 	<?php
@@ -165,7 +207,7 @@ add_action( 'admin_post_boutique_product_delete', function () {
 	$name = $p->get_name();
 	wp_trash_post( $id ); // to the trash (WordPress empties it after 30 days), so a mistake can still be undone
 	wc_delete_product_transients( $id );
-	wp_safe_redirect( boutique_products_page_url( [ 'deleted' => rawurlencode( $name ) ] ) );
+	wp_safe_redirect( boutique_products_page_url( boutique_products_back( $_POST['back'] ?? null ) + [ 'deleted' => rawurlencode( $name ) ] ) );
 	exit;
 } );
 
@@ -191,9 +233,12 @@ function boutique_products_page() {
 	if ( $cat ) { $list = array_values( array_filter( $list, fn( $p ) => has_term( $cat, 'product_cat', $p->get_id() ) ) ); }
 	if ( '' !== $q ) { $list = array_values( array_filter( $list, fn( $p ) => false !== mb_stripos( $p->get_name(), $q ) ) ); }
 	$total = count( $list );
+	// Back from editing on the last page, which publishing/deleting may have emptied: show the new last page.
+	$paged = min( $paged, max( 1, (int) ceil( $total / $per ) ) );
 	$list  = array_slice( $list, ( $paged - 1 ) * $per, $per );
 	$cats  = get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => false, 'exclude' => [ (int) get_option( 'default_product_cat' ) ] ] );
 	$keep  = array_filter( [ 'tab' => $tab, 'cat' => $cat, 'q' => $q ] );
+	$here  = $keep + ( $paged > 1 ? [ 'paged' => $paged ] : [] );   // this exact page, for «ویرایش» → save → back here
 	?>
 	<div class="wrap b-wrap b-list">
 		<header class="b-head">
@@ -239,6 +284,8 @@ function boutique_products_page() {
 			<?php if ( $q || $cat ) : ?><a class="b-btn b-btn--quiet" href="<?php echo esc_url( boutique_products_page_url( [ 'tab' => $tab ] ) ); ?>">پاک کردن</a><?php endif; ?>
 		</form>
 
+		<?php boutique_pager( $total, $per, $paged, fn( $pg ) => boutique_products_page_url( $keep + [ 'paged' => $pg ] ), 'top' ); ?>
+
 		<?php if ( ! $list ) : ?>
 			<section class="b-panel"><p class="b-empty">لباسی اینجا نیست.</p></section>
 		<?php else : ?>
@@ -246,11 +293,12 @@ function boutique_products_page() {
 				<?php foreach ( $list as $p ) :
 					[ $stock, $out, $n ] = boutique_product_stock_summary( $p );
 					$draft = 'publish' !== $p->get_status();
-					$ask   = function_exists( 'boutique_is_ask_price' ) && boutique_is_ask_price( $p ); ?>
+					$ask   = function_exists( 'boutique_is_ask_price' ) && boutique_is_ask_price( $p );
+					$edit  = $here ? add_query_arg( [ 'back' => $here ], boutique_product_url( $p->get_id() ) ) : boutique_product_url( $p->get_id() ); ?>
 					<li class="b-pcard<?php echo $draft ? ' is-draft' : ''; ?>">
-						<a class="b-pcard__img" href="<?php echo esc_url( boutique_product_url( $p->get_id() ) ); ?>" tabindex="-1" aria-hidden="true"><?php echo $p->get_image( 'woocommerce_thumbnail', [ 'alt' => '' ] ); ?></a>
+						<a class="b-pcard__img" href="<?php echo esc_url( $edit ); ?>" tabindex="-1" aria-hidden="true"><?php echo $p->get_image( 'woocommerce_thumbnail', [ 'alt' => '' ] ); ?></a>
 						<div class="b-pcard__body">
-							<a class="b-pcard__name" href="<?php echo esc_url( boutique_product_url( $p->get_id() ) ); ?>"><?php echo esc_html( $p->get_name() ); ?></a>
+							<a class="b-pcard__name" href="<?php echo esc_url( $edit ); ?>"><?php echo esc_html( $p->get_name() ); ?></a>
 							<div class="b-pcard__price"><?php echo $ask ? 'استعلام قیمت' : wp_kses_post( $p->get_price_html() ); ?></div>
 							<div class="b-pcard__chips">
 								<?php if ( $draft ) : ?><span class="b-state is-off">پیش‌نویس</span><?php endif; ?>
@@ -261,10 +309,10 @@ function boutique_products_page() {
 								<?php if ( $p->is_on_sale() ) : ?><span class="b-state is-sale">حراج</span><?php endif; ?>
 							</div>
 							<div class="b-pcard__actions">
-								<a class="b-btn" href="<?php echo esc_url( boutique_product_url( $p->get_id() ) ); ?>">ویرایش</a>
+								<a class="b-btn" href="<?php echo esc_url( $edit ); ?>">ویرایش</a>
 								<a class="b-btn b-btn--ghost" href="<?php echo esc_url( boutique_stock_url( $p->get_id() ) ); ?>">موجودی</a>
 								<?php if ( ! $draft ) : ?><a class="b-btn b-btn--quiet" href="<?php echo esc_url( get_permalink( $p->get_id() ) ); ?>" target="_blank" rel="noopener">در سایت</a><?php endif; ?>
-								<?php boutique_draft_delete_form( $p ); ?>
+								<?php boutique_draft_delete_form( $p, 'list', $here ); ?>
 							</div>
 						</div>
 					</li>
@@ -273,7 +321,7 @@ function boutique_products_page() {
 		<?php endif; ?>
 		<?php boutique_pager( $total, $per, $paged, fn( $pg ) => boutique_products_page_url( $keep + [ 'paged' => $pg ] ) ); ?>
 		<p class="b-foot">
-			<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=product_cat&post_type=product' ) ); ?>">دسته‌بندی‌ها</a> ·
+			<a href="<?php echo esc_url( boutique_admin_categories_url() ); ?>">دسته‌بندی‌ها</a> ·
 			<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=product_brand&post_type=product' ) ); ?>">برندها</a> ·
 			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=product&page=product-reviews' ) ); ?>">نظرات مشتری‌ها</a> ·
 			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=product' ) ); ?>">نمای کامل ووکامرس</a>

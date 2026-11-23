@@ -12,7 +12,7 @@ test.describe('دسترسی‌ها و منوی مدیریت', () => {
     await login(page, 'manager');
     await expect(page).toHaveURL(/page=boutique-today/);
     const menu = await adminMenu(page);
-    for (const item of ['امروز', 'فروش حضوری', 'موجودی', 'گزارش', 'سفارش‌ها', 'لباس‌ها']) expect(menu).toContain(item);
+    for (const item of ['امروز', 'فروش حضوری', 'موجودی', 'گزارش', 'سفارش‌ها', 'لباس‌ها', 'دسته‌بندی‌ها']) expect(menu).toContain(item);
     for (const item of ['نوشته‌ها', 'برگه‌ها', 'دیدگاه‌ها', 'نمایش', 'افزونه‌ها', 'ابزارها', 'تنظیمات', 'بازاریابی', 'تجزیه و تحلیل', 'ووکامرس فارسی', 'ووکامرس', 'کاربران']) expect(menu).not.toContain(item);
 
     // The old dashboard sends the manager back to «امروز».

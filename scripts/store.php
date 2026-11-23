@@ -83,6 +83,9 @@ $cats = [
 	'shawl'             => 'شال',
 	'hat'               => 'کلاه',
 	'socks'             => 'جوراب',
+	'sport-dress'       => 'پیراهن اسپرت',
+	'leggings'          => 'لگ',
+	'sport-leggings'    => 'لگ ورزشی',
 ];
 $cat_ids = [];
 foreach ( $cats as $slug => $name ) {

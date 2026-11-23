@@ -61,12 +61,12 @@ BRANDS = {  # key: lowercase latin letters / Persian with spaces removed
 
 # Title keyword -> category slug (first match wins).
 CATS = [
-    (r'ترک', 'turkish-dress'), (r'مجلسی|لباس\s*شب', 'evening'), (r'^(پیراهن|پیرهن)', 'casual'),
-    (r'کت\s*جین', 'denim-jacket'), (r'شلوار|جین|(^|\s)لگ(\s|$)', 'pants'), (r'عروسکی', 'babydoll-dress'), (r'سرهمی|اورال|رامپر', 'jumpsuit'),
+    (r'ترک', 'turkish-dress'), (r'مجلسی|لباس\s*شب', 'evening'), (r'^(پیراهن|پیرهن)\s*اسپرت', 'sport-dress'), (r'^(پیراهن|پیرهن)', 'casual'),
+    (r'کت\s*جین', 'denim-jacket'), (r'لگ\s*ورزشی', 'sport-leggings'), (r'(^|\s)لگ(\s|$)', 'leggings'), (r'شلوار|جین', 'pants'), (r'عروسکی', 'babydoll-dress'), (r'سرهمی|اورال|رامپر', 'jumpsuit'),
     (r'مانتو|پانچو', 'manteau'), (r'^کت|\sکت', 'jacket'), (r'تونیک', 'tunic'), (r'هودی', 'hoodie'),
-    (r'دورس|نیم\s*زیپ', 'sweatshirt'), (r'پولو', 'polo-shirt'), (r'کاردیگان|ژاکت|پلیور|پليور|پولیور', 'cardigan'),
+    (r'دورس|نیم\s*زیپ', 'sweatshirt'), (r'پولو', 'polo-shirt'), (r'پلیور|پليور|پولیور', 'pullover'), (r'کاردیگان|ژاکت', 'cardigan'),
     (r'تاپ\s*بافت', 'knit-top'), (r'تاپ|کراپ', 'top'), (r'شومیز', 'shomiz'), (r'بلوز', 'blouse'),
-    (r'دامن', 'skirt'), (r'مایو', 'swimsuit'), (r'بیکینی', 'bikini'), (r'شال', 'shawl'), (r'کلاه', 'hat'),
+    (r'دامن', 'skirt'), (r'مایو', 'swimsuit'), (r'بیکینی', 'bikini'), (r'شال', 'shawl'), (r'کلاه', 'hat'), (r'جوراب', 'socks'),
     (r'^ست\s', 'sets'), (r'پیراهن|پیرهن', 'casual'),
 ]
 LETTERS = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']

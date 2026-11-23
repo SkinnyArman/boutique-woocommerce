@@ -45,6 +45,8 @@ BRAND_NAMES = {
 
 # Title keyword -> category slug (first match wins; order matters).
 CATEGORY_RULES = [
+    (r'لگ\s*ورزشی', 'sport-leggings'),
+    (r'(^|\s)لگ(\s|$)', 'leggings'),
     (r'جین|شلوار', 'pants'),
     (r'ترک', 'turkish-dress'),
     (r'مجلسی', 'evening'),
@@ -52,7 +54,8 @@ CATEGORY_RULES = [
     (r'سرهمی|اورال', 'jumpsuit'),
     (r'تونیک', 'tunic'),
     (r'هودی', 'hoodie'),
-    (r'کاردیگان|ژاکت|پلیور|پليور', 'cardigan'),
+    (r'پلیور|پليور|پولیور', 'pullover'),
+    (r'کاردیگان|ژاکت', 'cardigan'),
     (r'تاپ بافت', 'knit-top'),
     (r'تاپ', 'top'),
     (r'شومیز', 'shomiz'),
@@ -60,6 +63,7 @@ CATEGORY_RULES = [
     (r'دامن', 'skirt'),
     (r'مایو', 'swimsuit'),
     (r'بیکینی', 'bikini'),
+    (r'(پیراهن|بیراهن)\s*اسپرت', 'sport-dress'),
     (r'پیراهن|بیراهن', 'casual'),
 ]
 

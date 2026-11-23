@@ -410,9 +410,15 @@
 .b-pcard__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .b-pcard__actions .b-btn { min-height: 34px; padding: 0 14px; font-size: 12px; }
 
-.b-pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 18px 0; }
-.b-pager a, .b-pager span { min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; text-decoration: none; color: var(--b-ink); background: #fff; box-shadow: inset 0 0 0 1px var(--b-line); }
-.b-pager span { background: var(--b-ink); color: #fff; box-shadow: none; }
+.b-pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin: 18px 0; }
+.b-pager--top { margin: 0 0 14px; }
+.b-pager a, .b-pager span { box-sizing: border-box; min-width: 40px; height: 44px; padding: 0 4px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; text-decoration: none; font-weight: 700; color: var(--b-ink); background: #fff; box-shadow: inset 0 0 0 1px var(--b-line); }
+.b-pager .b-pager__step { padding: 0 14px; }
+.b-pager [aria-current="page"] { background: var(--b-ink); color: #fff; box-shadow: none; }
+.b-pager .b-pager__step.is-off { opacity: .35; }
+.b-pager .b-pager__gap { min-width: 14px; padding: 0; background: none; box-shadow: none; color: #8a7577; }
+@media (max-width: 420px) { .b-pager { gap: 4px; } .b-pager a, .b-pager span { min-width: 36px; } .b-pager .b-pager__step { padding: 0 10px; } .b-pager .b-pager__gap { min-width: 10px; } }
+@media (max-width: 350px) { .b-pager { gap: 3px; } .b-pager a, .b-pager span { min-width: 31px; } .b-pager .b-pager__step { padding: 0 7px; } .b-pager .b-pager__gap { min-width: 8px; } }
 @media (max-width: 600px) { .b-pgrid { grid-template-columns: 1fr; } }
 
 /* Whole product card opens «ویرایش»: the name link stretches over the card; the buttons sit above it. */
@@ -436,3 +442,12 @@
 .b-appcard .b-ios-steps { list-style-type: persian; margin: 0 0 12px; padding-inline-start: 22px; line-height: 2; color: var(--b-ink); }
 .b-appcard .b-ios-steps b { direction: ltr; unicode-bidi: isolate; }
 .b-share-ico { vertical-align: -3px; color: #0a84ff; }
+
+/* «دسته‌بندی‌ها» */
+.b-cats__add label { display: block; margin-bottom: 8px; }
+.b-cats__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.b-cats__row input { flex: 1 1 220px; min-height: 44px; font-size: 15px; border-radius: 10px; }
+.b-catlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.b-catlist li { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 10px 12px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--b-line); }
+.b-catlist li.is-new { box-shadow: inset 0 0 0 2px var(--b-rose); }
+.b-catlist__links { font-size: 12px; }

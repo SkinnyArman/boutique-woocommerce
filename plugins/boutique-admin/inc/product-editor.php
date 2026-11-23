@@ -92,7 +92,8 @@ add_action( 'admin_post_boutique_product_save', function () {
 	$name = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
 	$reg  = $num( 'price' );
 	$sale = $num( 'sale_price' );
-	$back = fn( $args ) => wp_safe_redirect( add_query_arg( $args, boutique_product_url( $id ) ) );
+	$return = boutique_products_back( $_POST['back'] ?? null );   // the «لباس‌ها» page she came from
+	$back   = fn( $args ) => wp_safe_redirect( add_query_arg( $args + ( $return ? [ 'back' => $return ] : [] ), boutique_product_url( $id ) ) );
 	// «استعلام قیمت»: no price shown, not buyable online. The price boxes are disabled (so not sent)
 	// and any price already saved is kept for when the box is unticked.
 	$ask = ! empty( $_POST['ask_price'] );
@@ -246,7 +247,7 @@ add_action( 'admin_post_boutique_product_save', function () {
 	wc_delete_product_transients( $id );
 
 	// Back to the list «لباس‌ها», which says it was saved (with links to edit again / add another).
-	wp_safe_redirect( boutique_products_page_url( [ 'saved' => $p->get_status(), 'item' => $id ] ) );
+	wp_safe_redirect( boutique_products_page_url( $return + [ 'saved' => $p->get_status(), 'item' => $id ] ) );
 	exit;
 } );
 
@@ -304,6 +305,7 @@ function boutique_product_page() {
 	$cats    = get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => false, 'exclude' => [ (int) get_option( 'default_product_cat' ) ] ] );
 	$checked = $p ? $p->get_category_ids() : [];
 	$err     = sanitize_key( $_GET['err'] ?? '' );
+	$return  = boutique_products_back( $_GET['back'] ?? null );
 	?>
 	<div class="wrap b-wrap b-pe">
 		<header class="b-head">
@@ -315,7 +317,7 @@ function boutique_product_page() {
 				<div class="b-head__actions">
 					<?php if ( 'publish' === $p->get_status() ) : ?><a class="b-btn b-btn--ghost" href="<?php echo esc_url( $p->get_permalink() ); ?>" target="_blank">دیدن در سایت</a><?php endif; ?>
 					<a class="b-btn b-btn--quiet" href="<?php echo esc_url( boutique_classic_edit_url( $id ) ); ?>">حالت پیشرفته</a>
-					<?php boutique_draft_delete_form( $p, 'editor' ); ?>
+					<?php boutique_draft_delete_form( $p, 'editor', $return ); ?>
 				</div>
 			<?php endif; ?>
 		</header>
@@ -333,6 +335,7 @@ function boutique_product_page() {
 			<input type="hidden" name="images" id="b-pe-images" value="">
 			<input type="hidden" name="photo_colors" id="b-pe-photocolors" value="{}">
 			<input type="hidden" name="status" id="b-pe-status" value="publish">
+			<?php boutique_products_back_fields( $return ); ?>
 
 			<section class="b-panel">
 				<h2>۱. عکس‌ها</h2>

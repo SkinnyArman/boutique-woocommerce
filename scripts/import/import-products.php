@@ -28,7 +28,7 @@ foreach ( $args ?? [] as $a ) {
 }
 
 /* ------------------------------------------------ categories + size terms */
-$new_cats = [ 'top' => 'تاپ', 'jumpsuit' => 'سرهمی و اورال', 'tunic' => 'تونیک', 'cardigan' => 'ژاکت و پلیور', 'other' => 'سایر' ];
+$new_cats = [ 'top' => 'تاپ', 'jumpsuit' => 'سرهمی و اورال', 'tunic' => 'تونیک', 'cardigan' => 'ژاکت', 'pullover' => 'پلیور', 'leggings' => 'لگ', 'sport-leggings' => 'لگ ورزشی', 'sport-dress' => 'پیراهن اسپرت', 'other' => 'سایر' ];
 foreach ( $new_cats as $slug => $name ) {
 	if ( ! get_term_by( 'slug', $slug, 'product_cat' ) ) {
 		$t = wp_insert_term( $name, 'product_cat', [ 'slug' => $slug ] );

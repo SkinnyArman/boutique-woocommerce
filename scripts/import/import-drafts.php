@@ -46,7 +46,8 @@ $cat_names = [
 	'knit-top' => 'تاپ بافت', 'polo-shirt' => 'پولوشرت', 'turkish-dress' => 'پیراهن ترک', 'swimsuit' => 'مایو',
 	'babydoll-dress' => 'پیراهن عروسکی', 'bikini' => 'بیکینی', 'jacket' => 'کت', 'sweatshirt' => 'دورس', 'hoodie' => 'هودی',
 	'skirt' => 'دامن', 'casual' => 'پیراهن', 'manteau' => 'مانتو', 'shawl' => 'شال', 'hat' => 'کلاه', 'top' => 'تاپ',
-	'jumpsuit' => 'سرهمی و اورال', 'tunic' => 'تونیک', 'cardigan' => 'ژاکت و پلیور', 'other' => 'سایر', 'sets' => 'ست',
+	'jumpsuit' => 'سرهمی و اورال', 'tunic' => 'تونیک', 'cardigan' => 'ژاکت', 'pullover' => 'پلیور', 'leggings' => 'لگ', 'sport-leggings' => 'لگ ورزشی',
+	'sport-dress' => 'پیراهن اسپرت', 'socks' => 'جوراب', 'other' => 'سایر', 'sets' => 'ست',
 ];
 $cat_id = function ( $slug ) use ( $cat_names ) {
 	$t = get_term_by( 'slug', $slug, 'product_cat' );
